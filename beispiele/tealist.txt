@@ -1,0 +1,11 @@
+"Ali Babas 40 Düfte" 180 5
+"Asatsuyu" 90 7
+"Generic Black Tea" 180 5
+"Caramel" 120 6
+"Ceylon Pekoe" 120 6
+"China Jasmin" 120 6
+"Cool Down" 1273 0
+"Einer für alle" 540 6
+"Erdbeer-Sahne" 120 6
+"Erfrischungskräutertee" 480 6
+"Früchtepfund" 420 6
