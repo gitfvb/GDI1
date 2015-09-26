@@ -1,0 +1,86 @@
+;; The first three lines of this file were inserted by DrScheme. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname untitled_2) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f ())))
+;; Beispiele noch ergänzen
+
+
+;;struct for storing (directed) graph edges
+(define-struct edge (start end))
+
+(define samplegraph 
+  (list 
+   (make-edge 'a 'b)
+   (make-edge 'b 'a)
+   (make-edge 'a 'a)
+   (make-edge 'c 'd)
+   (make-edge 'a 'c)
+   (make-edge 'b 'c)
+   ))
+
+
+;;helper function contains?
+;:returns whether sym is contained in a list of symbols
+;;contract: contains: symbol list-of-symbols -> boolean
+;;example: (contains-symbol? 'a (1 2 3 4)) -> false
+;;example: (contains? 'a '(a b c d)) -> true
+
+(define (contains? sym alos)
+  (foldl (lambda (x c) (or (symbol=? sym x) c)) false alos))
+
+
+;; contract: neighbors :: node graph -> (listof node)
+;; purpose: Rückgabe der Nachbarn eines Graphen, erstellt
+;;          mit der Struktur edge, die einem Symbol entsprechen.
+;; example: (neighbors 'a (list (make-edge 'a 'b) (make-edge 'a 'a))) should be (list 'b 'a)
+
+(define (neighbors n G)
+  (foldl (lambda (x c) (append c (if (empty? x) empty (list x)))) empty           ;; alle von map erzeugten empty-Elemente aussortieren
+         (map (lambda (x) (if (symbol=? (edge-start x) n) (edge-end x) empty)) G) ;; Falls Element enhalten, zurückgeben... ansonsten empty
+         )
+  )
+
+;; Tests
+
+;(neighbors 'a samplegraph)
+;(neighbors 'b samplegraph)
+;(neighbors 'c samplegraph)
+
+
+;; contract: find-route :: node node graph -> (listof node)
+;; purpose: Konsumierung von einem Graphen und jeweils einem Start- und Ende-Knoten.
+;;          Rückgabe soll ein zyklenfreier Pfad vom Start- zum Endeknoten sein.
+;; example: (finde-route 'a 'c (graph))
+
+(define (find-route start end G)
+  (local
+    ((define (calc-route s visited)
+       (local
+         (
+          (define neighbors-list (neighbors s G))
+          (define route (append visited (list s)))
+          )
+         (cond
+           [(symbol=? start end) (list start)]  ;; Falls Start und Ende gleich
+           [(symbol=? s end) route]             ;; Falls das Ende erreicht ist, wird die Route ausgegeben
+           [(empty? neighbors-list) false]      ;; Beenden, bei Sackgasse
+           [(contains? s visited) false]        ;; Prüfung auf Loops
+           [else (map
+                  (lambda (x) (calc-route x route))
+                  neighbors-list)] ;; Rekursiver Aufruf mit map zum auflisten aller möglichen Wege
+           )))
+     (define (clear-route result)
+       (foldl (lambda (x c) (if (list? x) (clear-route x) empty)) empty result)
+       )
+     )
+    (clear-route       
+     (calc-route start empty) ;; Aufruf der Hilfsfunktion
+     )))
+
+(define (extract_lists lst)
+  (...)
+  )
+
+
+;; Tests
+
+(find-route 'a 'd samplegraph)

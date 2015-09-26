@@ -1,0 +1,53 @@
+;; The first three lines of this file were inserted by DrScheme. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname test2) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
+;; ermitteln, wann ein bestimmter Wert erreicht wird
+(define (maxPower x b p)
+  (cond
+    [(> (expt b p) x) p]
+    [else (maxPower x b (+ p 1))]
+    )
+  )
+
+;; Test
+(maxPower 10 2 0)
+
+;; contract: lengthrepresentation :: num num -> num
+;; purpose: Rückgabe zur Länge des jeweiligen Zahlensystems
+;; example: (lengthrepresentation 2 4) -> 4
+
+(define (lengthrepresentation x b)
+  (maxPower x b 0)
+  )
+
+;; Test
+(lengthrepresentation 10 2)
+
+
+;; contract: convert :: num num -> lon
+;; purpose: Darstellung einer Zahl x zur Basis b
+;; example: (convert 10 2) -> (list 1 0 1 0)
+
+(define (convert x b)
+  (local (
+          (define (remaining-ciphers rest-of-x p)
+            (cond
+              [(< p 1) empty]
+              [else (cons
+                     (floor (/ rest-of-x p))
+                     (remaining-ciphers (remainder rest-of-x p) (/ p b))
+                     )]
+              )
+            )
+          )
+    (remaining-ciphers
+     x
+     (expt b (- (lengthrepresentation x b) 1))
+                       )
+    )
+  )
+
+;; Test
+(check-expect (convert 10 2) (list 1 0 1 0))
+(check-expect (convert 12 2) (list 1 1 0 0))
+(check-expect (convert 120 16) (list 7 8))
